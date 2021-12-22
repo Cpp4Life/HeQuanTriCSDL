@@ -1,3 +1,5 @@
 /HQT_CSDL/nbproject
 /HQT_CSDL/*.xml
 /HQT_CSDL/*.mf
+/source/Fast-Store/nbproject/private/
+/source/Fast-Store/build/
