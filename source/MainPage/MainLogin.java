@@ -4,6 +4,9 @@
  */
 package hcmus.system;
 
+import java.sql.Connection;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author asus
@@ -14,6 +17,11 @@ public class MainLogin extends javax.swing.JFrame {
      * Creates new form MainLogin
      */
     public MainLogin() {
+        if (this.conn != null) {
+            System.out.println("Connection Successful");
+        } else {
+            System.out.println("Fail");
+        }
         initComponents();
     }
 
@@ -31,8 +39,9 @@ public class MainLogin extends javax.swing.JFrame {
         logoBtn = new javax.swing.JButton();
         loginForm = new javax.swing.JPanel();
         usernameField = new javax.swing.JTextField();
-        passwordField = new javax.swing.JTextField();
         loginBtn = new javax.swing.JButton();
+        passwordField = new javax.swing.JPasswordField();
+        guideLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Products Management System");
@@ -57,14 +66,27 @@ public class MainLogin extends javax.swing.JFrame {
         usernameField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         usernameField.setText("username");
 
-        passwordField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        passwordField.setText("password");
-
         loginBtn.setBackground(new java.awt.Color(190, 8, 8));
         loginBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         loginBtn.setForeground(new java.awt.Color(255, 255, 255));
         loginBtn.setText("Login");
         loginBtn.setBorderPainted(false);
+        loginBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginBtnActionPerformed(evt);
+            }
+        });
+
+        passwordField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        passwordField.setText("password");
+
+        guideLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        guideLabel.setText("<html>Doesn't have account? <strong>Register here!</strong></html>");
+        guideLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                guideLabelMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout loginFormLayout = new javax.swing.GroupLayout(loginForm);
         loginForm.setLayout(loginFormLayout);
@@ -73,21 +95,27 @@ public class MainLogin extends javax.swing.JFrame {
             .addGroup(loginFormLayout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addGroup(loginFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(usernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                    .addComponent(passwordField)
-                    .addComponent(loginBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(22, Short.MAX_VALUE))
+                    .addComponent(usernameField)
+                    .addComponent(loginBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(passwordField, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, loginFormLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(guideLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(105, 105, 105))
         );
         loginFormLayout.setVerticalGroup(
             loginFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loginFormLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(33, 33, 33)
                 .addComponent(loginBtn)
-                .addContainerGap(84, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(guideLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(59, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout loginPanelLayout = new javax.swing.GroupLayout(loginPanel);
@@ -101,8 +129,8 @@ public class MainLogin extends javax.swing.JFrame {
                     .addGroup(loginPanelLayout.createSequentialGroup()
                         .addComponent(logoBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(loginForm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(182, Short.MAX_VALUE))
+                        .addComponent(loginForm, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(167, Short.MAX_VALUE))
         );
         loginPanelLayout.setVerticalGroup(
             loginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -113,7 +141,7 @@ public class MainLogin extends javax.swing.JFrame {
                 .addGroup(loginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(logoBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(loginForm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addContainerGap(116, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -130,6 +158,35 @@ public class MainLogin extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
+        // TODO add your handling code here:
+        String username = usernameField.getText();
+        String password = String.valueOf(passwordField.getPassword());
+        boolean error = false;
+
+        if (username.length() == 0 || password.length() == 0) {
+            error = true;
+            JOptionPane.showMessageDialog(null, "Please enter all fields");
+        }
+
+        if (!error) {
+            this.conn = db.getDbConnection(username, password);
+            if (this.conn != null) {
+                JOptionPane.showMessageDialog(null, "Login Successfully");
+            } else {
+                JOptionPane.showMessageDialog(null, "Wrong password or username doesn't exist");
+                this.conn = null;
+            }
+        }
+    }//GEN-LAST:event_loginBtnActionPerformed
+
+    private void guideLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_guideLabelMouseClicked
+        // TODO add your handling code here:
+        setVisible(false);
+        MainRegister object = new MainRegister();
+        object.setVisible(true);
+    }//GEN-LAST:event_guideLabelMouseClicked
 
     /**
      * @param args the command line arguments
@@ -166,13 +223,18 @@ public class MainLogin extends javax.swing.JFrame {
         });
     }
 
+    private DatabaseConnection db = new DatabaseConnection();
+    private Connection conn = null;
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel guideLabel;
     private javax.swing.JButton loginBtn;
     private javax.swing.JPanel loginForm;
     private javax.swing.JLabel loginLabel;
     private javax.swing.JPanel loginPanel;
     private javax.swing.JButton logoBtn;
-    private javax.swing.JTextField passwordField;
+    private javax.swing.JPasswordField passwordField;
     private javax.swing.JTextField usernameField;
     // End of variables declaration//GEN-END:variables
 }

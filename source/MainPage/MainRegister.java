@@ -4,6 +4,13 @@
  */
 package hcmus.system;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author asus
@@ -37,6 +44,7 @@ public class MainRegister extends javax.swing.JFrame {
         typeComboBox = new javax.swing.JComboBox<>();
         passwordField = new javax.swing.JPasswordField();
         password2Field = new javax.swing.JPasswordField();
+        signUpBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Products Management System");
@@ -80,6 +88,17 @@ public class MainRegister extends javax.swing.JFrame {
 
         password2Field.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
+        signUpBtn.setBackground(new java.awt.Color(190, 8, 8));
+        signUpBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        signUpBtn.setForeground(new java.awt.Color(255, 255, 255));
+        signUpBtn.setText("Sign Me Up");
+        signUpBtn.setBorderPainted(false);
+        signUpBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                signUpBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout loginPanelLayout = new javax.swing.GroupLayout(loginPanel);
         loginPanel.setLayout(loginPanelLayout);
         loginPanelLayout.setHorizontalGroup(
@@ -109,6 +128,10 @@ public class MainRegister extends javax.swing.JFrame {
                                             .addComponent(password2Label))))
                                 .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap(153, Short.MAX_VALUE))
+            .addGroup(loginPanelLayout.createSequentialGroup()
+                .addGap(336, 336, 336)
+                .addComponent(signUpBtn)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         loginPanelLayout.setVerticalGroup(
             loginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -133,7 +156,9 @@ public class MainRegister extends javax.swing.JFrame {
                 .addComponent(typeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(typeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(123, Short.MAX_VALUE))
+                .addGap(35, 35, 35)
+                .addComponent(signUpBtn)
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -150,6 +175,42 @@ public class MainRegister extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void signUpBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpBtnActionPerformed
+        // TODO add your handling code here:
+        String username = usernameField.getText();
+        String password = String.valueOf(passwordField.getPassword());
+        String password2 = String.valueOf(password2Field.getPassword());
+        String type = String.valueOf(typeComboBox.getSelectedItem());
+        boolean error = false;
+
+        if (username.length() == 0 || password.length() == 0 || password2.length() == 0) {
+            error = true;
+            JOptionPane.showMessageDialog(null, "Please enter all fields");
+        } else if (!password.equals(password2)) {
+            error = true;
+            JOptionPane.showMessageDialog(null, "Passwords do not match");
+        } else if (type.equals("None")) {
+            error = true;
+            JOptionPane.showMessageDialog(null, "Please choose a type of account");
+        }
+
+        if (!error) {
+            try {
+                Connection conn = db.getAdminConnection();
+                
+                String createLogin = "CREATE LOGIN " + username + " WITH PASSWORD = '" + password + "'";
+                System.out.println(createLogin);
+                PreparedStatement stmt = conn.prepareStatement(createLogin);              
+                int i = stmt.executeUpdate();
+                System.out.println(i + "row(s) affected");
+                
+                db.closeConnection(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(MainRegister.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_signUpBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -187,6 +248,8 @@ public class MainRegister extends javax.swing.JFrame {
         });
     }
 
+    DatabaseConnection db = new DatabaseConnection();
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel loginLabel;
     private javax.swing.JLabel loginNameLabel;
@@ -195,6 +258,7 @@ public class MainRegister extends javax.swing.JFrame {
     private javax.swing.JPasswordField password2Field;
     private javax.swing.JLabel password2Label;
     private javax.swing.JPasswordField passwordField;
+    private javax.swing.JButton signUpBtn;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JComboBox<String> typeComboBox;
     private javax.swing.JLabel typeLabel;
