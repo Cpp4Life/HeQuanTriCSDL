@@ -7,6 +7,7 @@ package hcmus.system;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -213,7 +214,7 @@ public class MainRegister extends javax.swing.JFrame {
                 } else if (type.equals("Tài xế")) {
                     addRole = "call SP_ADDROLEMEMBER 'TX', '" + userSQL + "'";
                 } else if (type.equals("Nhân viên")) {
-                    addRole = "{call SP_ADDROLEMEMBER 'NV', '" + userSQL + "'}";
+                    addRole = "EXEC SP_ADDROLEMEMBER 'NV', ?";
                 }
 
                 System.out.println(createLogin);
@@ -234,8 +235,9 @@ public class MainRegister extends javax.swing.JFrame {
 
                 // EXEC SP_ADDROLEMEMBER
                 System.out.println("\nEXECUTE ADD ROLE MEMBER");
-                Statement st = conn.createStatement();
-                st.executeQuery(addRole);
+                CallableStatement st = conn.prepareCall(addRole);
+                st.setString(1, userSQL);
+                st.execute();
                 
 
                 db.closeConnection(conn);
