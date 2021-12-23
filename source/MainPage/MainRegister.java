@@ -4,9 +4,11 @@
  */
 package hcmus.system;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -198,13 +200,44 @@ public class MainRegister extends javax.swing.JFrame {
         if (!error) {
             try {
                 Connection conn = db.getAdminConnection();
-                
+
                 String createLogin = "CREATE LOGIN " + username + " WITH PASSWORD = '" + password + "'";
+                String userSQL = "user_" + username;
+                String createUser = "CREATE USER " + userSQL + " FOR LOGIN " + username;
+                String addRole = null;
+
+                if (type.equals("Đối tác")) {
+                    addRole = "call SP_ADDROLEMEMBER 'DT', '" + userSQL + "'";
+                } else if (type.equals("Khách hàng")) {
+                    addRole = "call SP_ADDROLEMEMBER 'KH', '" + userSQL + "'";
+                } else if (type.equals("Tài xế")) {
+                    addRole = "call SP_ADDROLEMEMBER 'TX', '" + userSQL + "'";
+                } else if (type.equals("Nhân viên")) {
+                    addRole = "{call SP_ADDROLEMEMBER 'NV', '" + userSQL + "'}";
+                }
+
                 System.out.println(createLogin);
-                PreparedStatement stmt = conn.prepareStatement(createLogin);              
+                System.out.println(createUser);
+                System.out.println(addRole);
+
+                // CREATE LOGIN
+                System.out.println("\nCALL CREATE LOGIN");
+                PreparedStatement stmt = conn.prepareStatement(createLogin);
                 int i = stmt.executeUpdate();
                 System.out.println(i + "row(s) affected");
+
+                // CREATE USER FOR LOGIN
+                System.out.println("\nCALL CREATE USER");
+                stmt = conn.prepareStatement(createUser);
+                i = stmt.executeUpdate();
+                System.out.println(i + "row(s) affected");
+
+                // EXEC SP_ADDROLEMEMBER
+                System.out.println("\nEXECUTE ADD ROLE MEMBER");
+                Statement st = conn.createStatement();
+                st.executeQuery(addRole);
                 
+
                 db.closeConnection(conn);
             } catch (SQLException ex) {
                 Logger.getLogger(MainRegister.class.getName()).log(Level.SEVERE, null, ex);
@@ -249,7 +282,7 @@ public class MainRegister extends javax.swing.JFrame {
     }
 
     DatabaseConnection db = new DatabaseConnection();
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel loginLabel;
     private javax.swing.JLabel loginNameLabel;
