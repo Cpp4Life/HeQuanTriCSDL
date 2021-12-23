@@ -23,7 +23,9 @@ public class MainPartnerForm extends javax.swing.JFrame {
     DefaultTableModel tableOrder;
     DefaultTableModel tableContract;
     DefaultTableModel tableBranch;
-    private static Connection _connection; 
+    DefaultTableModel tableProduct;
+    private static Connection _connection;
+    private static String partnerID;
     public void switchPanels(JPanel panel){
         layeredPane.removeAll();
         layeredPane.add(panel);
@@ -32,6 +34,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
     }
     public static Connection getConnection(){
         return _connection;
+    }
+    
+    public static String getPartnerID(){
+        return partnerID;
     }
     /**
      * Creates new form CreateContractForm
@@ -78,14 +84,12 @@ public class MainPartnerForm extends javax.swing.JFrame {
         ProductPane = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
+        AddProductButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        jTableProduct = new javax.swing.JTable();
+        DeleteProductButton = new javax.swing.JButton();
+        EditProductButton = new javax.swing.JButton();
+        BranchSupButton = new javax.swing.JButton();
         BranchPane = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTableBranch = new javax.swing.JTable();
@@ -100,7 +104,6 @@ public class MainPartnerForm extends javax.swing.JFrame {
         OrderNavButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(800, 500));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 222, 105));
@@ -266,53 +269,69 @@ public class MainPartnerForm extends javax.swing.JFrame {
                     .addGap(0, 0, Short.MAX_VALUE)))
         );
 
-        jLabel2.setText("Branch id:");
+        AddProductButton.setBackground(new java.awt.Color(190, 8, 8));
+        AddProductButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        AddProductButton.setForeground(new java.awt.Color(255, 255, 255));
+        AddProductButton.setText("Add");
+        AddProductButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddProductButtonActionPerformed(evt);
+            }
+        });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jButton1.setBackground(new java.awt.Color(190, 8, 8));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Add");
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableProduct.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ProductID", "Product name", "Unit Price"
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, true, true
+            };
 
-        jButton3.setBackground(new java.awt.Color(190, 8, 8));
-        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("Delete");
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTableProduct.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(jTableProduct);
 
-        jButton4.setBackground(new java.awt.Color(190, 8, 8));
-        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setText("Edit");
+        DeleteProductButton.setBackground(new java.awt.Color(190, 8, 8));
+        DeleteProductButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        DeleteProductButton.setForeground(new java.awt.Color(255, 255, 255));
+        DeleteProductButton.setText("Delete");
+        DeleteProductButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeleteProductButtonActionPerformed(evt);
+            }
+        });
 
-        jButton5.setBackground(new java.awt.Color(190, 8, 8));
-        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setText("Branch supply");
+        EditProductButton.setBackground(new java.awt.Color(190, 8, 8));
+        EditProductButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        EditProductButton.setForeground(new java.awt.Color(255, 255, 255));
+        EditProductButton.setText("Edit");
+        EditProductButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditProductButtonActionPerformed(evt);
+            }
+        });
+
+        BranchSupButton.setBackground(new java.awt.Color(190, 8, 8));
+        BranchSupButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BranchSupButton.setForeground(new java.awt.Color(255, 255, 255));
+        BranchSupButton.setText("Branch supply");
+        BranchSupButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BranchSupButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout ProductPaneLayout = new javax.swing.GroupLayout(ProductPane);
         ProductPane.setLayout(ProductPaneLayout);
         ProductPaneLayout.setHorizontalGroup(
             ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(ProductPaneLayout.createSequentialGroup()
-                .addGap(289, 289, 289)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ProductPaneLayout.createSequentialGroup()
                 .addContainerGap(21, Short.MAX_VALUE)
                 .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -320,13 +339,13 @@ public class MainPartnerForm extends javax.swing.JFrame {
                         .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 681, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(ProductPaneLayout.createSequentialGroup()
-                                .addComponent(jButton5)
+                                .addComponent(BranchSupButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton4)
+                                .addComponent(EditProductButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3)
+                                .addComponent(DeleteProductButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1)))
+                                .addComponent(AddProductButton)))
                         .addGap(22, 22, 22))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ProductPaneLayout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -337,18 +356,14 @@ public class MainPartnerForm extends javax.swing.JFrame {
             .addGroup(ProductPaneLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                 .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4)
-                    .addComponent(jButton5))
+                    .addComponent(AddProductButton)
+                    .addComponent(DeleteProductButton)
+                    .addComponent(EditProductButton)
+                    .addComponent(BranchSupButton))
                 .addGap(15, 15, 15))
         );
 
@@ -611,12 +626,27 @@ public class MainPartnerForm extends javax.swing.JFrame {
         }
         catch(Exception e){
             e.printStackTrace();
-            JOptionPane.showMessageDialog(BranchPane, "SYS ERROR!!");
+            JOptionPane.showMessageDialog(ContractPane, "SYS ERROR!!");
         }        
     }//GEN-LAST:event_ContractNavButtonActionPerformed
 
     private void ProductNavButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProductNavButtonActionPerformed
         switchPanels(ProductPane);
+        tableProduct = (DefaultTableModel)jTableProduct.getModel();
+        tableProduct.setRowCount(0);
+        String queryProduct = "SELECT * FROM SANPHAM";
+        try{
+            PreparedStatement ppState = _connection.prepareStatement(queryProduct);
+            rs = ppState.executeQuery();
+            while(rs.next()){
+                tableProduct.addRow(new Object[]{rs.getString("MASP"),
+                rs.getString("TENSP"),rs.getInt("DONGIA")});
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(ProductPane, "SYS ERROR!!");
+        }
     }//GEN-LAST:event_ProductNavButtonActionPerformed
 
     private void OrderNavButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OrderNavButtonActionPerformed
@@ -651,15 +681,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 for(int row: selected){
                     int statusUpdate = Integer.parseInt(tableOrder.getValueAt(row, 7).toString());
                     String updOrderQRY = "UPDATE DONHANG SET TINHTRANG = ?";               
-                    try{
                         PreparedStatement ppState = _connection.prepareStatement(updOrderQRY);
                         ppState.setInt(1,statusUpdate); //TENHS              
                         ppState.execute();
                         JOptionPane.showMessageDialog(rootPane,"Cập nhật thành công");
-                    }
-                    catch(Exception e){
-                        e.printStackTrace();
-                    }
                 }
             }
         }
@@ -679,6 +704,76 @@ public class MainPartnerForm extends javax.swing.JFrame {
         System.exit(0);
         //TODO: BACK TO LOGIN SCREEN
     }//GEN-LAST:event_AccountButton1ActionPerformed
+
+    private void AddProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddProductButtonActionPerformed
+        AddProductForm addForm = new AddProductForm(partnerID);
+        addForm.setVisible(true);
+    }//GEN-LAST:event_AddProductButtonActionPerformed
+
+    private void DeleteProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteProductButtonActionPerformed
+        try{            
+            if(jTableProduct.getSelectedRow()<0){
+                JOptionPane.showMessageDialog(rootPane, "No product is selected to update");
+            }
+            else{
+                int row = jTableProduct.getSelectedRow();
+                String ID = tableProduct.getValueAt(row,0).toString();
+                String dlProductQRY = "DELETE SANPHAM WHERE MASP = ?";               
+                PreparedStatement ppState = _connection.prepareStatement(dlProductQRY);
+                ppState.setString(1,ID);
+                if(!ppState.execute()){
+                    JOptionPane.showMessageDialog(rootPane,"DELETE SUCCESS");
+                }
+                else{
+                    JOptionPane.showMessageDialog(rootPane,"DELETE FAIL");
+                }
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_DeleteProductButtonActionPerformed
+
+    private void EditProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditProductButtonActionPerformed
+        try{            
+            if(jTableProduct.getSelectedRow()<0){
+                JOptionPane.showMessageDialog(rootPane, "No product is selected to update");
+            }
+            else{
+                int row = jTableProduct.getSelectedRow();
+                int price = Integer.parseInt(tableProduct.getValueAt(row,2).toString());
+                String name = tableProduct.getValueAt(row,1).toString();
+                String ID = tableProduct.getValueAt(row,0).toString();
+                String updProductQRY = "UPDATE SANPHAM SET TENSP = ?, DONGIA = ?"
+                        + " WHERE MASP = ?";               
+                PreparedStatement ppState = _connection.prepareStatement(updProductQRY);
+                ppState.setString(1,name);
+                ppState.setInt(2,price);
+                ppState.setString(3,ID);
+                if(!ppState.execute()){
+                    JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                }
+                else{
+                    JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                }
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_EditProductButtonActionPerformed
+
+    private void BranchSupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BranchSupButtonActionPerformed
+        int index = jTableProduct.getSelectedRow();
+        if(index>=0){
+            String pdID = tableProduct.getValueAt(index, 0).toString();
+            BranchSupplyForm branchSupForm = new BranchSupplyForm(pdID);
+            branchSupForm.setVisible(true);
+        }
+        else{
+            JOptionPane.showMessageDialog(rootPane,"No product is selected");
+        }
+    }//GEN-LAST:event_BranchSupButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -721,24 +816,22 @@ public class MainPartnerForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AccountButton;
     private javax.swing.JButton AccountButton1;
+    private javax.swing.JButton AddProductButton;
     private javax.swing.JButton BranchNavButton;
     private javax.swing.JPanel BranchPane;
+    private javax.swing.JButton BranchSupButton;
     private javax.swing.JButton ContractNavButton;
     private javax.swing.JPanel ContractPane;
+    private javax.swing.JButton DeleteProductButton;
+    private javax.swing.JButton EditProductButton;
     private javax.swing.JButton OrderNavButton;
     private javax.swing.JPanel OrderPane;
     private javax.swing.JButton ProductNavButton;
     private javax.swing.JPanel ProductPane;
     private javax.swing.JButton UpdateOrderButton;
     private javax.swing.JButton WatchDetailContractButton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -751,10 +844,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTable jTableBranch;
     private javax.swing.JTable jTableContract;
     private javax.swing.JTable jTableOrder;
+    private javax.swing.JTable jTableProduct;
     private javax.swing.JLayeredPane layeredPane;
     // End of variables declaration//GEN-END:variables
 }

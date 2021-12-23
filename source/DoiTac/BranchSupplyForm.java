@@ -3,7 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package UI;
-
+import static UI.MainPartnerForm.getConnection;
+import static UI.MainPartnerForm.getPartnerID;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.JOptionPane;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author Admin
@@ -13,8 +21,38 @@ public class BranchSupplyForm extends javax.swing.JFrame {
     /**
      * Creates new form BranchSupplyForm
      */
-    public BranchSupplyForm() {
+    static String productID;
+    static Connection conn;
+    ResultSet rs;
+    DefaultTableModel tableBranchSup;
+    public BranchSupplyForm(String pdID) {
+        productID = pdID;
+        conn = getConnection();
         initComponents();
+                jComboBoxBranchID.removeAllItems();
+        try{
+            tableBranchSup = (DefaultTableModel)jTableBranchSup.getModel();
+            tableBranchSup.setRowCount(0);
+            String branchSupQRY = "SELECT* FROM DANGBAN WHERE MASP = ?";
+            PreparedStatement ppState = conn.prepareStatement(branchSupQRY);
+            ppState.setString(1,productID);
+            rs = ppState.executeQuery();
+            while(rs.next()){
+                tableBranchSup.addRow(new Object[]{rs.getString("MASP"),rs.getString("MACN"), rs.getInt("SOLUONG")});
+            }
+            String branch = "SELECT MACN FROM CHINHANH WHERE MADT = ?";
+            ppState = conn.prepareStatement(branch);
+            //ppState.setString(1, getPartnerID());
+            ppState.setString(1, "TK0003");
+            rs = ppState.executeQuery();
+            while(rs.next()){
+                jComboBoxBranchID.addItem(rs.getString("MACN"));
+            }
+            
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -31,16 +69,22 @@ public class BranchSupplyForm extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jTextField1 = new javax.swing.JTextField();
+        jTableBranchSup = new javax.swing.JTable();
+        DeleteBranchSupButton = new javax.swing.JButton();
+        AddBranchSupButton = new javax.swing.JButton();
+        jComboBoxBranchID = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        SpinnerModel spinnerModel = new SpinnerNumberModel(10,0,200,1);
+        Quantity = new javax.swing.JSpinner(spinnerModel);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(800, 550));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 222, 105));
@@ -73,24 +117,42 @@ public class BranchSupplyForm extends javax.swing.JFrame {
                     .addGap(0, 0, Short.MAX_VALUE)))
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableBranchSup.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ProductID", "BranchID", "Quantity"
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
 
-        jButton1.setText("Delete");
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jTableBranchSup);
 
-        jButton2.setText("Add");
+        DeleteBranchSupButton.setText("Delete");
+        DeleteBranchSupButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeleteBranchSupButtonActionPerformed(evt);
+            }
+        });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        AddBranchSupButton.setText("Add");
+        AddBranchSupButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddBranchSupButtonActionPerformed(evt);
+            }
+        });
+
+        jComboBoxBranchID.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
@@ -115,15 +177,15 @@ public class BranchSupplyForm extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jComboBoxBranchID, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Quantity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(69, 69, 69)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(DeleteBranchSupButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(AddBranchSupButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 748, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(28, Short.MAX_VALUE))
         );
@@ -134,15 +196,15 @@ public class BranchSupplyForm extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(33, 33, 33)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(AddBranchSupButton, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jComboBoxBranchID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Quantity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(DeleteBranchSupButton)
                 .addContainerGap(49, Short.MAX_VALUE))
         );
 
@@ -157,6 +219,58 @@ public class BranchSupplyForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void AddBranchSupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddBranchSupButtonActionPerformed
+        String addBranchSupQRY = "INSERT DANGBAN VALUES (?, ?, ?)";
+        try{
+            PreparedStatement ppState = conn.prepareStatement(addBranchSupQRY);
+            String branch = String.valueOf(jComboBoxBranchID.getSelectedItem());
+            
+            ppState.setString(1,branch);
+            ppState.setString(2,productID);
+            ppState.setInt(3,Integer.parseInt(Quantity.getValue().toString()));
+            
+            if(!ppState.execute()){
+                JOptionPane.showMessageDialog(rootPane, "ADD SUCCESS");
+            }
+            else{
+                JOptionPane.showMessageDialog(rootPane, "ADD FAIL");
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_AddBranchSupButtonActionPerformed
+
+    private void DeleteBranchSupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteBranchSupButtonActionPerformed
+        String dlBranchSupQRY = "DELETE DANGBAN WHERE MACN = ?";
+        try{
+            int index = jTableBranchSup.getSelectedRow();
+                if(index>=0){
+                    PreparedStatement ppState = conn.prepareStatement(dlBranchSupQRY);
+                    String branch = tableBranchSup.getValueAt(index, 2).toString();
+
+                    ppState.setString(1,branch);
+
+                    if(!ppState.execute()){
+                        JOptionPane.showMessageDialog(rootPane, "DELETE SUCCESS");
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(rootPane, "DELETE FAIL");
+                    }
+                }
+            else{
+                JOptionPane.showMessageDialog(rootPane,"No any row is selected");
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_DeleteBranchSupButtonActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        this.setVisible(false);
+    }//GEN-LAST:event_formWindowClosed
 
     /**
      * @param args the command line arguments
@@ -188,22 +302,22 @@ public class BranchSupplyForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new BranchSupplyForm().setVisible(true);
+                new BranchSupplyForm(productID).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton AddBranchSupButton;
+    private javax.swing.JButton DeleteBranchSupButton;
+    private javax.swing.JSpinner Quantity;
+    private javax.swing.JComboBox<String> jComboBoxBranchID;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTable jTableBranchSup;
     // End of variables declaration//GEN-END:variables
 }
