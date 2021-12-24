@@ -2,7 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hcmus.system;
+package hcmus.system.TaiXe;
+
+import hcmus.system.MainPage.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -15,6 +22,7 @@ public class OnGoingOrder extends javax.swing.JFrame {
      */
     public OnGoingOrder() {
         initComponents();
+        showOrders();
     }
 
     /**
@@ -37,6 +45,7 @@ public class OnGoingOrder extends javax.swing.JFrame {
         onGoingLabel = new javax.swing.JLabel();
         profileBtn = new javax.swing.JButton();
         helpBtn = new javax.swing.JButton();
+        updateBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Products Management System");
@@ -59,6 +68,11 @@ public class OnGoingOrder extends javax.swing.JFrame {
         orderBtn.setForeground(new java.awt.Color(255, 255, 255));
         orderBtn.setText("Orders");
         orderBtn.setBorderPainted(false);
+        orderBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                orderBtnActionPerformed(evt);
+            }
+        });
 
         onGoingBtn.setBackground(new java.awt.Color(190, 8, 8));
         onGoingBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -72,18 +86,23 @@ public class OnGoingOrder extends javax.swing.JFrame {
         historyBtn.setText("History");
         historyBtn.setBorderPainted(false);
 
-        orderTable.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        orderTable.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         orderTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
-                "Product Name", "Delivery Status", "Delivery Description"
+                "Order ID", "Product ID", "Delivery Status", "Delivery Description"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(orderTable);
 
         onGoingLabel.setBackground(new java.awt.Color(190, 8, 8));
@@ -98,6 +117,11 @@ public class OnGoingOrder extends javax.swing.JFrame {
         profileBtn.setForeground(new java.awt.Color(255, 255, 255));
         profileBtn.setText("Profile");
         profileBtn.setBorderPainted(false);
+        profileBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                profileBtnActionPerformed(evt);
+            }
+        });
 
         helpBtn.setBackground(new java.awt.Color(190, 8, 8));
         helpBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -105,36 +129,45 @@ public class OnGoingOrder extends javax.swing.JFrame {
         helpBtn.setText("Help");
         helpBtn.setBorderPainted(false);
 
+        updateBtn.setBackground(new java.awt.Color(190, 8, 8));
+        updateBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        updateBtn.setForeground(new java.awt.Color(255, 255, 255));
+        updateBtn.setText("Update");
+        updateBtn.setBorderPainted(false);
+
         javax.swing.GroupLayout orderPanelLayout = new javax.swing.GroupLayout(orderPanel);
         orderPanel.setLayout(orderPanelLayout);
         orderPanelLayout.setHorizontalGroup(
             orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, orderPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(onGoingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(249, 249, 249))
             .addGroup(orderPanelLayout.createSequentialGroup()
-                .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(orderPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1)
-                            .addGroup(orderPanelLayout.createSequentialGroup()
-                                .addComponent(logoBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(orderPanelLayout.createSequentialGroup()
-                                        .addComponent(dateField, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(101, 101, 101)
-                                        .addComponent(profileBtn)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(helpBtn))
-                                    .addGroup(orderPanelLayout.createSequentialGroup()
-                                        .addComponent(orderBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(75, 75, 75)
-                                        .addComponent(onGoingBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(76, 76, 76)
-                                        .addComponent(historyBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                    .addGroup(orderPanelLayout.createSequentialGroup()
-                        .addGap(242, 242, 242)
-                        .addComponent(onGoingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(updateBtn)
+                    .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(orderPanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(logoBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(orderPanelLayout.createSequentialGroup()
+                                    .addComponent(dateField, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(101, 101, 101)
+                                    .addComponent(profileBtn)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(helpBtn))
+                                .addGroup(orderPanelLayout.createSequentialGroup()
+                                    .addComponent(orderBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(75, 75, 75)
+                                    .addComponent(onGoingBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(76, 76, 76)
+                                    .addComponent(historyBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(orderPanelLayout.createSequentialGroup()
+                            .addGap(19, 19, 19)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 761, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         orderPanelLayout.setVerticalGroup(
             orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,7 +192,9 @@ public class OnGoingOrder extends javax.swing.JFrame {
                 .addGap(44, 44, 44)
                 .addComponent(onGoingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(updateBtn)
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -178,6 +213,42 @@ public class OnGoingOrder extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void profileBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profileBtnActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        new DriverProfile().setVisible(true);
+    }//GEN-LAST:event_profileBtnActionPerformed
+
+    private void orderBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orderBtnActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        new Order().setVisible(true);
+    }//GEN-LAST:event_orderBtnActionPerformed
+
+    private void showOrders() {
+        Connection adminConn = db.getAdminConnection();
+        String selectDonHang = "SELECT * FROM DONHANG WHERE TINHTRANG = 2";
+
+        try {
+            DefaultTableModel tableModel = (DefaultTableModel) orderTable.getModel();
+            PreparedStatement stmt = adminConn.prepareStatement(selectDonHang);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String orderId = rs.getString("MADH");
+                String productId = rs.getString("MASP");
+                int deliveryStatus = rs.getInt("TINHTRANG");
+                String deliveryDescription = "ĐANG GIAO";
+
+                Object[] data = {orderId, productId, deliveryStatus, deliveryDescription,};
+                tableModel.addRow(data);
+            }
+
+            db.closeConnection(adminConn);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -195,13 +266,13 @@ public class OnGoingOrder extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         //</editor-fold>
@@ -216,6 +287,8 @@ public class OnGoingOrder extends javax.swing.JFrame {
         });
     }
 
+    private DatabaseConnection db = new DatabaseConnection();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField dateField;
     private javax.swing.JButton helpBtn;
@@ -228,5 +301,6 @@ public class OnGoingOrder extends javax.swing.JFrame {
     private javax.swing.JPanel orderPanel;
     private javax.swing.JTable orderTable;
     private javax.swing.JButton profileBtn;
+    private javax.swing.JButton updateBtn;
     // End of variables declaration//GEN-END:variables
 }

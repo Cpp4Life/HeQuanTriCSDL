@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hcmus.system;
+package hcmus.system.TaiXe;
 
+import hcmus.system.MainPage.*;
 import java.util.List;
 import java.sql.*;
 import java.util.ArrayList;
@@ -376,7 +377,7 @@ public class DriverRegister extends javax.swing.JFrame {
                 System.out.println(accountTableSize + "\n" + username + " " + password);
 
                 db.closeConnection(adminConn);
-                
+
                 setVisible(false);
                 new DriverProfile().setVisible(true);
             }

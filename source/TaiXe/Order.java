@@ -2,7 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hcmus.system;
+package hcmus.system.TaiXe;
+
+import hcmus.system.MainPage.*;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,6 +22,7 @@ public class Order extends javax.swing.JFrame {
      */
     public Order() {
         initComponents();
+        showOrders();
     }
 
     /**
@@ -35,14 +43,12 @@ public class Order extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         orderTable = new javax.swing.JTable();
         detailPanel = new javax.swing.JPanel();
-        deliveryLabel = new javax.swing.JLabel();
-        deliveryAddress = new javax.swing.JTextField();
         shipFeeLabel = new javax.swing.JLabel();
         shipFee = new javax.swing.JTextField();
         qtyLabel = new javax.swing.JLabel();
-        qty = new javax.swing.JTextField();
+        qtyField = new javax.swing.JTextField();
         totalLabel = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        totalField = new javax.swing.JTextField();
         acceptBtn = new javax.swing.JButton();
         profileBtn = new javax.swing.JButton();
         helpBtn = new javax.swing.JButton();
@@ -74,6 +80,11 @@ public class Order extends javax.swing.JFrame {
         onGoingBtn.setForeground(new java.awt.Color(255, 255, 255));
         onGoingBtn.setText("On-Going");
         onGoingBtn.setBorderPainted(false);
+        onGoingBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onGoingBtnActionPerformed(evt);
+            }
+        });
 
         historyBtn.setBackground(new java.awt.Color(190, 8, 8));
         historyBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -81,28 +92,31 @@ public class Order extends javax.swing.JFrame {
         historyBtn.setText("History");
         historyBtn.setBorderPainted(false);
 
-        orderTable.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        orderTable.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         orderTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
-                "Product Name", "Description", "Price"
+                "Order ID", "Product ID", "Delivery Status", "Delivery Address", "Price"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        orderTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                orderTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(orderTable);
 
         detailPanel.setBackground(new java.awt.Color(255, 255, 255));
-
-        deliveryLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        deliveryLabel.setText("Delivery Address");
-
-        deliveryAddress.setEditable(false);
-        deliveryAddress.setBackground(new java.awt.Color(255, 255, 255));
-        deliveryAddress.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
         shipFeeLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         shipFeeLabel.setText("Ship Fee");
@@ -111,22 +125,23 @@ public class Order extends javax.swing.JFrame {
         shipFee.setBackground(new java.awt.Color(255, 255, 255));
         shipFee.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         shipFee.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        shipFee.setText("25.000đ");
 
         qtyLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         qtyLabel.setText("Quantity");
 
-        qty.setEditable(false);
-        qty.setBackground(new java.awt.Color(255, 255, 255));
-        qty.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        qty.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        qtyField.setEditable(false);
+        qtyField.setBackground(new java.awt.Color(255, 255, 255));
+        qtyField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        qtyField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         totalLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         totalLabel.setText("Total");
 
-        jTextField1.setEditable(false);
-        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        totalField.setEditable(false);
+        totalField.setBackground(new java.awt.Color(255, 255, 255));
+        totalField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        totalField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         acceptBtn.setBackground(new java.awt.Color(190, 8, 8));
         acceptBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -145,7 +160,6 @@ public class Order extends javax.swing.JFrame {
             .addGroup(detailPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(deliveryAddress)
                     .addGroup(detailPanelLayout.createSequentialGroup()
                         .addComponent(shipFeeLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -153,38 +167,31 @@ public class Order extends javax.swing.JFrame {
                     .addGroup(detailPanelLayout.createSequentialGroup()
                         .addComponent(qtyLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(qty, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(detailPanelLayout.createSequentialGroup()
-                        .addComponent(deliveryLabel)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(qtyField, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(detailPanelLayout.createSequentialGroup()
                         .addComponent(totalLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(totalField, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         detailPanelLayout.setVerticalGroup(
             detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(detailPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(deliveryLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(deliveryAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(85, 85, 85)
                 .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(shipFeeLabel)
-                    .addComponent(shipFee, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(shipFee, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(qtyLabel)
-                    .addComponent(qty, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(32, 32, 32)
-                .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(qtyField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(qtyLabel))
+                .addGap(27, 27, 27)
+                .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(totalLabel)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24)
+                    .addComponent(totalField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(29, 29, 29)
                 .addComponent(acceptBtn)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         profileBtn.setBackground(new java.awt.Color(190, 8, 8));
@@ -192,6 +199,11 @@ public class Order extends javax.swing.JFrame {
         profileBtn.setForeground(new java.awt.Color(255, 255, 255));
         profileBtn.setText("Profile");
         profileBtn.setBorderPainted(false);
+        profileBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                profileBtnActionPerformed(evt);
+            }
+        });
 
         helpBtn.setBackground(new java.awt.Color(190, 8, 8));
         helpBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -247,9 +259,9 @@ public class Order extends javax.swing.JFrame {
                             .addComponent(onGoingBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(historyBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(18, 18, 18)
-                .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(detailPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(orderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                    .addComponent(detailPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
 
@@ -268,6 +280,71 @@ public class Order extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void profileBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profileBtnActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        new DriverProfile().setVisible(true);
+    }//GEN-LAST:event_profileBtnActionPerformed
+
+    private void orderTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_orderTableMouseClicked
+        try {
+            // TODO add your handling code here:
+            DefaultTableModel tableModel = (DefaultTableModel) orderTable.getModel();
+            int selectedIndexRow = orderTable.getSelectedRow();
+            String orderId = tableModel.getValueAt(selectedIndexRow, 0).toString();
+            System.out.println("orderId");
+
+            Connection adminConn = db.getAdminConnection();
+            String selectDonHang = "SELECT * FROM DONHANG WHERE MADH='" + orderId + "'";
+
+            PreparedStatement stmt = adminConn.prepareStatement(selectDonHang);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int qty = rs.getInt("SOLUONG");
+                double total = rs.getDouble("TONGTIEN");
+
+                qtyField.setText(String.valueOf(qty));
+                totalField.setText(String.valueOf(total));
+            }
+
+            db.closeConnection(adminConn);
+        } catch (SQLException ex) {
+            Logger.getLogger(Order.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_orderTableMouseClicked
+
+    private void onGoingBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onGoingBtnActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        new OnGoingOrder().setVisible(true);
+    }//GEN-LAST:event_onGoingBtnActionPerformed
+
+    private void showOrders() {
+        Connection adminConn = db.getAdminConnection();
+        String selectDonHang = "SELECT * FROM DONHANG";
+
+        try {
+            DefaultTableModel tableModel = (DefaultTableModel) orderTable.getModel();
+
+            PreparedStatement stmt = adminConn.prepareStatement(selectDonHang);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String orderId = rs.getString("MADH");
+                String productId = rs.getString("MASP");
+                String deliveryAddr = rs.getString("DIACHIGIAOHANG");
+                double price = rs.getDouble("DONGIA");
+                int deliveryStatus = rs.getInt("TINHTRANG");
+
+                Object[] data = {orderId, productId, deliveryStatus, deliveryAddr, price};
+                tableModel.addRow(data);
+            }
+
+            db.closeConnection(adminConn);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -285,13 +362,13 @@ public class Order extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DriverRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         //</editor-fold>
@@ -306,26 +383,26 @@ public class Order extends javax.swing.JFrame {
         });
     }
 
+    private DatabaseConnection db = new DatabaseConnection();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton acceptBtn;
     private javax.swing.JTextField dateField;
-    private javax.swing.JTextField deliveryAddress;
-    private javax.swing.JLabel deliveryLabel;
     private javax.swing.JPanel detailPanel;
     private javax.swing.JButton helpBtn;
     private javax.swing.JButton historyBtn;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JButton logoBtn;
     private javax.swing.JButton onGoingBtn;
     private javax.swing.JButton orderBtn;
     private javax.swing.JPanel orderPanel;
     private javax.swing.JTable orderTable;
     private javax.swing.JButton profileBtn;
-    private javax.swing.JTextField qty;
+    private javax.swing.JTextField qtyField;
     private javax.swing.JLabel qtyLabel;
     private javax.swing.JTextField shipFee;
     private javax.swing.JLabel shipFeeLabel;
+    private javax.swing.JTextField totalField;
     private javax.swing.JLabel totalLabel;
     // End of variables declaration//GEN-END:variables
 }

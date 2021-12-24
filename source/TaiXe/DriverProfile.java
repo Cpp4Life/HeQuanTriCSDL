@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hcmus.system;
+package hcmus.system.TaiXe;
 
+import hcmus.system.MainPage.*;
 import java.util.ArrayList;
 import java.sql.*;
 import java.util.logging.Level;
@@ -265,6 +266,11 @@ public class DriverProfile extends javax.swing.JFrame {
         onGoingBtn.setForeground(new java.awt.Color(255, 255, 255));
         onGoingBtn.setText("On-Going");
         onGoingBtn.setBorderPainted(false);
+        onGoingBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onGoingBtnActionPerformed(evt);
+            }
+        });
 
         historyBtn.setBackground(new java.awt.Color(190, 8, 8));
         historyBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -365,6 +371,12 @@ public class DriverProfile extends javax.swing.JFrame {
         setVisible(false);
         new Order().setVisible(true);
     }//GEN-LAST:event_orderBtnActionPerformed
+
+    private void onGoingBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onGoingBtnActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        new OnGoingOrder().setVisible(true);
+    }//GEN-LAST:event_onGoingBtnActionPerformed
 
     private void displayInfo() {
         try {
