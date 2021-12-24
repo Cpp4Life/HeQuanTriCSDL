@@ -4,7 +4,9 @@
  */
 package hcmus.system;
 
-import java.sql.Connection;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -17,11 +19,6 @@ public class MainLogin extends javax.swing.JFrame {
      * Creates new form MainLogin
      */
     public MainLogin() {
-        if (this.conn != null) {
-            System.out.println("Connection Successful");
-        } else {
-            System.out.println("Fail");
-        }
         initComponents();
     }
 
@@ -64,7 +61,7 @@ public class MainLogin extends javax.swing.JFrame {
         loginForm.setBackground(new java.awt.Color(255, 255, 255));
 
         usernameField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        usernameField.setText("username");
+        usernameField.setText("driverDat");
 
         loginBtn.setBackground(new java.awt.Color(190, 8, 8));
         loginBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -78,7 +75,7 @@ public class MainLogin extends javax.swing.JFrame {
         });
 
         passwordField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        passwordField.setText("password");
+        passwordField.setText("123");
 
         guideLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         guideLabel.setText("<html>Doesn't have account? <strong>Register here!</strong></html>");
@@ -129,8 +126,8 @@ public class MainLogin extends javax.swing.JFrame {
                     .addGroup(loginPanelLayout.createSequentialGroup()
                         .addComponent(logoBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(loginForm, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(167, Short.MAX_VALUE))
+                        .addComponent(loginForm, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(172, Short.MAX_VALUE))
         );
         loginPanelLayout.setVerticalGroup(
             loginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -161,8 +158,11 @@ public class MainLogin extends javax.swing.JFrame {
 
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
         // TODO add your handling code here:
-        String username = usernameField.getText();
-        String password = String.valueOf(passwordField.getPassword());
+        username = usernameField.getText();
+        password = String.valueOf(passwordField.getPassword());
+        String selectAccount = "SELECT * FROM TAIKHOAN WHERE TENTK='" + username + "'";
+        int accountType = 0;
+
         boolean error = false;
 
         if (username.length() == 0 || password.length() == 0) {
@@ -171,12 +171,41 @@ public class MainLogin extends javax.swing.JFrame {
         }
 
         if (!error) {
-            this.conn = db.getDbConnection(username, password);
-            if (this.conn != null) {
-                JOptionPane.showMessageDialog(null, "Login Successfully");
+            Connection adminConn = db.getAdminConnection();
+            Connection userConn = db.getDbConnection(username, password);
+
+            if (userConn != null) {
+                try {
+                    //JOptionPane.showMessageDialog(null, "Login Successfully");
+                    PreparedStatement stmt = adminConn.prepareStatement(selectAccount);
+                    ResultSet rs = stmt.executeQuery();
+                    while (rs.next()) {
+                        accountType = rs.getInt(5);
+                        System.out.println(accountType);
+                    }
+
+                    db.closeConnection(adminConn);
+                    db.closeConnection(userConn);
+
+                    switch (accountType) {
+                        case 1: // Khách hàng
+                            break;
+                        case 2: // Tài xế
+                            setVisible(false);
+                            new DriverProfile().setVisible(true);
+                            break;
+                        case 3: // Đối tác
+                            break;
+                        case 4: // Nhân viên
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(MainLogin.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } else {
                 JOptionPane.showMessageDialog(null, "Wrong password or username doesn't exist");
-                this.conn = null;
             }
         }
     }//GEN-LAST:event_loginBtnActionPerformed
@@ -187,6 +216,10 @@ public class MainLogin extends javax.swing.JFrame {
         MainRegister object = new MainRegister();
         object.setVisible(true);
     }//GEN-LAST:event_guideLabelMouseClicked
+
+    public static String getUsername() {
+        return username;
+    }
 
     /**
      * @param args the command line arguments
@@ -224,8 +257,7 @@ public class MainLogin extends javax.swing.JFrame {
     }
 
     private DatabaseConnection db = new DatabaseConnection();
-    private Connection conn = null;
-
+    private static String username, password;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel guideLabel;

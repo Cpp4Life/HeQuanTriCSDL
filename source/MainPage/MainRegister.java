@@ -47,7 +47,7 @@ public class MainRegister extends javax.swing.JFrame {
         typeComboBox = new javax.swing.JComboBox<>();
         passwordField = new javax.swing.JPasswordField();
         password2Field = new javax.swing.JPasswordField();
-        signUpBtn = new javax.swing.JButton();
+        continueBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Products Management System");
@@ -91,14 +91,14 @@ public class MainRegister extends javax.swing.JFrame {
 
         password2Field.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
-        signUpBtn.setBackground(new java.awt.Color(190, 8, 8));
-        signUpBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        signUpBtn.setForeground(new java.awt.Color(255, 255, 255));
-        signUpBtn.setText("Sign Me Up");
-        signUpBtn.setBorderPainted(false);
-        signUpBtn.addActionListener(new java.awt.event.ActionListener() {
+        continueBtn.setBackground(new java.awt.Color(190, 8, 8));
+        continueBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        continueBtn.setForeground(new java.awt.Color(255, 255, 255));
+        continueBtn.setText("Continue");
+        continueBtn.setBorderPainted(false);
+        continueBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                signUpBtnActionPerformed(evt);
+                continueBtnActionPerformed(evt);
             }
         });
 
@@ -132,8 +132,8 @@ public class MainRegister extends javax.swing.JFrame {
                                 .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap(153, Short.MAX_VALUE))
             .addGroup(loginPanelLayout.createSequentialGroup()
-                .addGap(336, 336, 336)
-                .addComponent(signUpBtn)
+                .addGap(343, 343, 343)
+                .addComponent(continueBtn)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         loginPanelLayout.setVerticalGroup(
@@ -160,7 +160,7 @@ public class MainRegister extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(typeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(35, 35, 35)
-                .addComponent(signUpBtn)
+                .addComponent(continueBtn)
                 .addContainerGap(57, Short.MAX_VALUE))
         );
 
@@ -179,10 +179,10 @@ public class MainRegister extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void signUpBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpBtnActionPerformed
+    private void continueBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueBtnActionPerformed
         // TODO add your handling code here:
-        String username = usernameField.getText();
-        String password = String.valueOf(passwordField.getPassword());
+        this.username = usernameField.getText();
+        this.password = String.valueOf(passwordField.getPassword());
         String password2 = String.valueOf(password2Field.getPassword());
         String type = String.valueOf(typeComboBox.getSelectedItem());
         boolean error = false;
@@ -199,20 +199,21 @@ public class MainRegister extends javax.swing.JFrame {
         }
 
         if (!error) {
+            System.out.println(username + " " + password);
             try {
                 Connection conn = db.getAdminConnection();
 
-                String createLogin = "CREATE LOGIN " + username + " WITH PASSWORD = '" + password + "'";
-                String userSQL = "user_" + username;
-                String createUser = "CREATE USER " + userSQL + " FOR LOGIN " + username;
+                String createLogin = "CREATE LOGIN " + this.username + " WITH PASSWORD = '" + this.password + "'";
+                String userSQL = this.username;
+                String createUser = "CREATE USER " + userSQL + " FOR LOGIN " + this.username;
                 String addRole = null;
 
                 if (type.equals("Đối tác")) {
-                    addRole = "call SP_ADDROLEMEMBER 'DT', '" + userSQL + "'";
+                    addRole = "EXEC SP_ADDROLEMEMBER 'DT', ?";
                 } else if (type.equals("Khách hàng")) {
-                    addRole = "call SP_ADDROLEMEMBER 'KH', '" + userSQL + "'";
+                    addRole = "EXEC SP_ADDROLEMEMBER 'KH', ?";
                 } else if (type.equals("Tài xế")) {
-                    addRole = "call SP_ADDROLEMEMBER 'TX', '" + userSQL + "'";
+                    addRole = "EXEC SP_ADDROLEMEMBER 'TX', ?";
                 } else if (type.equals("Nhân viên")) {
                     addRole = "EXEC SP_ADDROLEMEMBER 'NV', ?";
                 }
@@ -238,14 +239,34 @@ public class MainRegister extends javax.swing.JFrame {
                 CallableStatement st = conn.prepareCall(addRole);
                 st.setString(1, userSQL);
                 st.execute();
-                
 
                 db.closeConnection(conn);
+
+                setVisible(false);
+                if (type.equals("Đối tác")) {
+
+                } else if (type.equals("Khách hàng")) {
+
+                } else if (type.equals("Tài xế")) {
+                    new DriverRegister().setVisible(true);
+                } else if (type.equals("Nhân viên")) {
+
+                }
+
             } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Username has been taken");
                 Logger.getLogger(MainRegister.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }//GEN-LAST:event_signUpBtnActionPerformed
+    }//GEN-LAST:event_continueBtnActionPerformed
+
+    public static String getUsername() {
+        return username;
+    }
+
+    public static String getPassword() {
+        return password;
+    }
 
     /**
      * @param args the command line arguments
@@ -284,8 +305,10 @@ public class MainRegister extends javax.swing.JFrame {
     }
 
     DatabaseConnection db = new DatabaseConnection();
+    private static String username, password;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton continueBtn;
     private javax.swing.JLabel loginLabel;
     private javax.swing.JLabel loginNameLabel;
     private javax.swing.JPanel loginPanel;
@@ -293,7 +316,6 @@ public class MainRegister extends javax.swing.JFrame {
     private javax.swing.JPasswordField password2Field;
     private javax.swing.JLabel password2Label;
     private javax.swing.JPasswordField passwordField;
-    private javax.swing.JButton signUpBtn;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JComboBox<String> typeComboBox;
     private javax.swing.JLabel typeLabel;
