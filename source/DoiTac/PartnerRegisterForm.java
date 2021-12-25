@@ -305,7 +305,6 @@ public class PartnerRegisterForm extends javax.swing.JFrame {
                 String insertDriver = "INSERT INTO DOITAC(MADT, TENDT,"
                         + " DAIDIENDT, DIACHIDT, EMAILDT, SOCHINHANHDK, "
                         + "TONGSODONHANG, LOAIHANGVANCHUYEN) VALUES(?,?,?,?,?,?,?,?)";
-
                 int accountTableSize = 0;
 
                 Connection adminConn = db.getAdminConnection();

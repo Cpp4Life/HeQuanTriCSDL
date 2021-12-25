@@ -5,8 +5,10 @@
 package DoiTac;
 
 import MainPage.DatabaseConnection;
+import MainPage.MainLogin;
 import static MainPage.MainLogin.getAccountID;
 import static MainPage.MainLogin.getDBConnection;
+import MainPage.MainRegister;
 import static MainPage.MainRegister.getPassword;
 import static MainPage.MainRegister.getUsername;
 import java.awt.Image;
@@ -53,6 +55,8 @@ public class MainPartnerForm extends javax.swing.JFrame {
     private static Connection _connection;
     private static String partnerID;
     DatabaseConnection db;
+    String username;
+    String password;
     public void switchPanels(JPanel panel){
         layeredPane.removeAll();
         layeredPane.add(panel);
@@ -72,7 +76,9 @@ public class MainPartnerForm extends javax.swing.JFrame {
     public MainPartnerForm() {
         db = new DatabaseConnection();
         partnerID = getAccountID();
-        _connection = getDBConnection();
+        username = MainRegister.getUsername() == null ? MainLogin.getUsername() : MainRegister.getUsername();
+        password = MainRegister.getPassword() == null ? MainLogin.getPassword() : MainRegister.getPassword();
+        _connection = db.getDbConnection(username, password);
         initComponents();
     }
 
@@ -100,6 +106,7 @@ public class MainPartnerForm extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTableContract = new javax.swing.JTable();
         WatchDetailContractButton = new javax.swing.JButton();
+        CreateContractButton = new javax.swing.JButton();
         ProductPane = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -119,6 +126,8 @@ public class MainPartnerForm extends javax.swing.JFrame {
         jTableBranch = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
+        Delete1BranchButton = new javax.swing.JButton();
+        Delete2BranchButton = new javax.swing.JButton();
         OrderPane = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -243,13 +252,24 @@ public class MainPartnerForm extends javax.swing.JFrame {
             }
         });
 
+        CreateContractButton.setText("Create");
+        CreateContractButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CreateContractButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout ContractPaneLayout = new javax.swing.GroupLayout(ContractPane);
         ContractPane.setLayout(ContractPaneLayout);
         ContractPaneLayout.setHorizontalGroup(
             ContractPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ContractPaneLayout.createSequentialGroup()
                 .addGroup(ContractPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(WatchDetailContractButton)
+                    .addGroup(ContractPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(CreateContractButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(WatchDetailContractButton))
                     .addGroup(ContractPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(ContractPaneLayout.createSequentialGroup()
                             .addGap(263, 263, 263)
@@ -267,7 +287,9 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(WatchDetailContractButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(ContractPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(WatchDetailContractButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(CreateContractButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
 
@@ -470,6 +492,7 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 "BranchID", "ContractID", "Address", "Number of Orders"
             }
         ));
+        jTableBranch.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(jTableBranch);
 
         jPanel4.setBackground(new java.awt.Color(190, 8, 8));
@@ -498,18 +521,38 @@ public class MainPartnerForm extends javax.swing.JFrame {
                     .addGap(0, 0, Short.MAX_VALUE)))
         );
 
+        Delete1BranchButton.setText("Delete1");
+        Delete1BranchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Delete1BranchButtonActionPerformed(evt);
+            }
+        });
+
+        Delete2BranchButton.setText("Delete2");
+        Delete2BranchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Delete2BranchButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout BranchPaneLayout = new javax.swing.GroupLayout(BranchPane);
         BranchPane.setLayout(BranchPaneLayout);
         BranchPaneLayout.setHorizontalGroup(
             BranchPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(BranchPaneLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(BranchPaneLayout.createSequentialGroup()
                 .addGap(288, 288, 288)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(BranchPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(BranchPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BranchPaneLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(Delete1BranchButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(Delete2BranchButton)))
+                .addContainerGap())
         );
         BranchPaneLayout.setVerticalGroup(
             BranchPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -518,7 +561,11 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(BranchPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Delete1BranchButton)
+                    .addComponent(Delete2BranchButton))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         layeredPane.add(BranchPane, "card4");
@@ -775,9 +822,11 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 int[] selected = jTableOrder.getSelectedRows();
                 for(int row: selected){
                     int statusUpdate = Integer.parseInt(tableOrder.getValueAt(row, 7).toString());
-                    String updOrderQRY = "UPDATE DONHANG SET TINHTRANG = ?";               
+                    String orderID = tableOrder.getValueAt(row,1).toString();
+                    String updOrderQRY = "UPDATE DONHANG SET TINHTRANG = ? WHERE MADH = ?";               
                         PreparedStatement ppState = _connection.prepareStatement(updOrderQRY);
-                        ppState.setInt(1,statusUpdate); //TENHS              
+                        ppState.setInt(1,statusUpdate); //TENHS
+                        ppState.setString(2,orderID);
                         ppState.execute();
                         JOptionPane.showMessageDialog(rootPane,"Cập nhật thành công");
                 }
@@ -851,10 +900,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 if(cstmt.execute()){
                     int rs = cstmt.getInt(1);
                     if(rs ==1){
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
                     }
                     else{
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
                     }
                 }
                 else{
@@ -910,10 +959,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 if(!cstmt.execute()){
                     int rs = cstmt.getInt(1);
                     if(rs ==1){
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
                     }
                     else{
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
                     }
                 }
                 else{
@@ -950,10 +999,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 if(!cstmt.execute()){
                     int rs = cstmt.getInt(1);
                     if(rs ==1){
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
                     }
                     else{
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
                     }
                 }
                 else{
@@ -990,10 +1039,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 if(!cstmt.execute()){
                     int rs = cstmt.getInt(1);
                     if(rs ==1){
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
                     }
                     else{
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
                     }
                 }
                 else{
@@ -1030,10 +1079,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 if(!cstmt.execute()){
                     int rs = cstmt.getInt(1);
                     if(rs ==1){
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
                     }
                     else{
-                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                        JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
                     }
                 }
                 cstmt.close();
@@ -1044,6 +1093,67 @@ public class MainPartnerForm extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }//GEN-LAST:event_inPriceDLButtonActionPerformed
+
+    private void Delete1BranchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Delete1BranchButtonActionPerformed
+        int index = jTableBranch.getSelectedRow();
+        if (index<0){
+            JOptionPane.showMessageDialog(BranchPane,"No any row is selected");
+        }
+        else{
+            try{
+            CallableStatement cstmt = _connection.prepareCall("{? = call XOA_CHI_NHANH_TRAN1(?, ?)}");
+            cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            cstmt.setString(2,tableBranch.getValueAt(index, 0).toString());
+            cstmt.setString(3,partnerID);
+            if(!cstmt.execute()){
+                int rs = cstmt.getInt(1);
+                if(rs ==1){
+                    JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                }
+                else{
+                    JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                }
+            }
+            cstmt.close();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_Delete1BranchButtonActionPerformed
+
+    private void Delete2BranchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Delete2BranchButtonActionPerformed
+        int index = jTableBranch.getSelectedRow();
+        if (index<0){
+            JOptionPane.showMessageDialog(BranchPane,"No any row is selected");
+        }
+        else{
+            try{
+            CallableStatement cstmt = _connection.prepareCall("{? = call XOA_CHI_NHANH_TRAN2(?, ?)}");
+            cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            cstmt.setString(2,tableBranch.getValueAt(index, 0).toString());
+            cstmt.setString(3,partnerID);
+            if(!cstmt.execute()){
+                int rs = cstmt.getInt(1);
+                if(rs ==1){
+                    JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                }
+                else{
+                    JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                }
+            }
+            cstmt.close();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_Delete2BranchButtonActionPerformed
+
+    private void CreateContractButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateContractButtonActionPerformed
+        CreateContractForm ccF = new CreateContractForm();
+        ccF.setVisible(true);
+    }//GEN-LAST:event_CreateContractButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1093,8 +1203,11 @@ public class MainPartnerForm extends javax.swing.JFrame {
     private javax.swing.JButton BranchSupButton;
     private javax.swing.JButton ContractNavButton;
     private javax.swing.JPanel ContractPane;
+    private javax.swing.JButton CreateContractButton;
     private javax.swing.JButton CutPriceDLProductButton;
     private javax.swing.JButton CutPriceProductButton;
+    private javax.swing.JButton Delete1BranchButton;
+    private javax.swing.JButton Delete2BranchButton;
     private javax.swing.JButton DeleteProductButton;
     private javax.swing.JButton OrderNavButton;
     private javax.swing.JPanel OrderPane;
