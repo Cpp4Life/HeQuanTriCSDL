@@ -2,8 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hcmus.system;
+package MainPage;
 
+import DoiTac.*;
+import TaiXe.DriverRegister;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +28,6 @@ public class MainRegister extends javax.swing.JFrame {
     public MainRegister() {
         initComponents();
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -178,7 +179,7 @@ public class MainRegister extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void continueBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueBtnActionPerformed
         // TODO add your handling code here:
         this.username = usernameField.getText();
@@ -244,9 +245,10 @@ public class MainRegister extends javax.swing.JFrame {
 
                 setVisible(false);
                 if (type.equals("Đối tác")) {
-
+                    PartnerRegisterForm dkDoiTac = new PartnerRegisterForm();
+                    dkDoiTac.setVisible(true);
                 } else if (type.equals("Khách hàng")) {
-
+                    
                 } else if (type.equals("Tài xế")) {
                     new DriverRegister().setVisible(true);
                 } else if (type.equals("Nhân viên")) {

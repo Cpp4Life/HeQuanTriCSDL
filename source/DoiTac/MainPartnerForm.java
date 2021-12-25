@@ -2,13 +2,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package UI;
+package DoiTac;
 
+import MainPage.DatabaseConnection;
+import static MainPage.MainLogin.getAccountID;
+import static MainPage.MainLogin.getDBConnection;
+import static MainPage.MainRegister.getPassword;
+import static MainPage.MainRegister.getUsername;
 import java.awt.Image;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.CallableStatement;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,7 +24,27 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Admin
  */
+
+
 public class MainPartnerForm extends javax.swing.JFrame {
+    public void ReFresh(){
+        tableProduct = (DefaultTableModel)jTableProduct.getModel();
+        tableProduct.setRowCount(0);
+        String queryProduct = "SELECT * FROM DTV_DTSANPHAM";
+        try{
+            PreparedStatement ppState = _connection.prepareStatement(queryProduct);
+            rs = ppState.executeQuery();
+            while(rs.next()){
+                tableProduct.addRow(new Object[]{rs.getString("MASP"),
+                rs.getString("TENSP"),rs.getInt("DONGIA")});
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(ProductPane, "SYS ERROR!!");
+        }
+    }
+    
     ResultSet rs = null;
     DefaultTableModel tableOrder;
     DefaultTableModel tableContract;
@@ -26,34 +52,27 @@ public class MainPartnerForm extends javax.swing.JFrame {
     DefaultTableModel tableProduct;
     private static Connection _connection;
     private static String partnerID;
+    DatabaseConnection db;
     public void switchPanels(JPanel panel){
         layeredPane.removeAll();
         layeredPane.add(panel);
         layeredPane.repaint();
         layeredPane.revalidate();
     }
-    public static Connection getConnection(){
-        return _connection;
-    }
     
     public static String getPartnerID(){
         return partnerID;
+    }
+    public static Connection getConnection(){
+        return _connection;
     }
     /**
      * Creates new form CreateContractForm
      */
     public MainPartnerForm() {
-        try{
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            _connection = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=QLDonHang;user=sa;password=dong*0909768334");
-            if(_connection != null){
-                System.out.println("Connected");
-                System.out.println(_connection);
-            }
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
+        db = new DatabaseConnection();
+        partnerID = getAccountID();
+        _connection = getDBConnection();
         initComponents();
     }
 
@@ -88,8 +107,13 @@ public class MainPartnerForm extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableProduct = new javax.swing.JTable();
         DeleteProductButton = new javax.swing.JButton();
-        EditProductButton = new javax.swing.JButton();
+        inPriceFixButton = new javax.swing.JButton();
         BranchSupButton = new javax.swing.JButton();
+        CutPriceDLProductButton = new javax.swing.JButton();
+        inPriceButton = new javax.swing.JButton();
+        CutPriceProductButton = new javax.swing.JButton();
+        AmountTextField = new javax.swing.JTextField();
+        inPriceDLButton = new javax.swing.JButton();
         BranchPane = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTableBranch = new javax.swing.JTable();
@@ -104,6 +128,7 @@ public class MainPartnerForm extends javax.swing.JFrame {
         OrderNavButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 222, 105));
@@ -119,6 +144,11 @@ public class MainPartnerForm extends javax.swing.JFrame {
         });
 
         AccountButton.setText("Account");
+        AccountButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AccountButtonActionPerformed(evt);
+            }
+        });
 
         AccountButton1.setText("Exit");
         AccountButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -237,8 +267,8 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(WatchDetailContractButton, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(WatchDetailContractButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         layeredPane.add(ContractPane, "card3");
@@ -308,13 +338,13 @@ public class MainPartnerForm extends javax.swing.JFrame {
             }
         });
 
-        EditProductButton.setBackground(new java.awt.Color(190, 8, 8));
-        EditProductButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        EditProductButton.setForeground(new java.awt.Color(255, 255, 255));
-        EditProductButton.setText("Edit");
-        EditProductButton.addActionListener(new java.awt.event.ActionListener() {
+        inPriceFixButton.setBackground(new java.awt.Color(190, 8, 8));
+        inPriceFixButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        inPriceFixButton.setForeground(new java.awt.Color(255, 255, 255));
+        inPriceFixButton.setText("Increase(fix)");
+        inPriceFixButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                EditProductButtonActionPerformed(evt);
+                inPriceFixButtonActionPerformed(evt);
             }
         });
 
@@ -328,6 +358,48 @@ public class MainPartnerForm extends javax.swing.JFrame {
             }
         });
 
+        CutPriceDLProductButton.setBackground(new java.awt.Color(190, 8, 8));
+        CutPriceDLProductButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        CutPriceDLProductButton.setForeground(new java.awt.Color(255, 255, 255));
+        CutPriceDLProductButton.setText("Cut-DL");
+        CutPriceDLProductButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CutPriceDLProductButtonActionPerformed(evt);
+            }
+        });
+
+        inPriceButton.setBackground(new java.awt.Color(190, 8, 8));
+        inPriceButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        inPriceButton.setForeground(new java.awt.Color(255, 255, 255));
+        inPriceButton.setText("Increase");
+        inPriceButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inPriceButtonActionPerformed(evt);
+            }
+        });
+
+        CutPriceProductButton.setBackground(new java.awt.Color(190, 8, 8));
+        CutPriceProductButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        CutPriceProductButton.setForeground(new java.awt.Color(255, 255, 255));
+        CutPriceProductButton.setText("Cut-price");
+        CutPriceProductButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CutPriceProductButtonActionPerformed(evt);
+            }
+        });
+
+        AmountTextField.setText("Amount:");
+
+        inPriceDLButton.setBackground(new java.awt.Color(190, 8, 8));
+        inPriceDLButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        inPriceDLButton.setForeground(new java.awt.Color(255, 255, 255));
+        inPriceDLButton.setText("Increase-DL");
+        inPriceDLButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inPriceDLButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout ProductPaneLayout = new javax.swing.GroupLayout(ProductPane);
         ProductPane.setLayout(ProductPaneLayout);
         ProductPaneLayout.setHorizontalGroup(
@@ -336,20 +408,32 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 .addContainerGap(21, Short.MAX_VALUE)
                 .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ProductPaneLayout.createSequentialGroup()
-                        .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 681, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(ProductPaneLayout.createSequentialGroup()
-                                .addComponent(BranchSupButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(EditProductButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(DeleteProductButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(AddProductButton)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 681, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(22, 22, 22))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ProductPaneLayout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(249, 249, 249))))
+                        .addGap(249, 249, 249))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ProductPaneLayout.createSequentialGroup()
+                        .addComponent(BranchSupButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(AddProductButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(DeleteProductButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(ProductPaneLayout.createSequentialGroup()
+                                .addComponent(AmountTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(inPriceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(ProductPaneLayout.createSequentialGroup()
+                                .addComponent(CutPriceProductButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(inPriceFixButton)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(CutPriceDLProductButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(inPriceDLButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(22, 22, 22))))
         );
         ProductPaneLayout.setVerticalGroup(
             ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -358,13 +442,20 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(AddProductButton)
                     .addComponent(DeleteProductButton)
-                    .addComponent(EditProductButton)
-                    .addComponent(BranchSupButton))
-                .addGap(15, 15, 15))
+                    .addComponent(BranchSupButton)
+                    .addComponent(inPriceButton)
+                    .addComponent(AmountTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(inPriceDLButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(ProductPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CutPriceDLProductButton)
+                    .addComponent(CutPriceProductButton)
+                    .addComponent(inPriceFixButton))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         layeredPane.add(ProductPane, "card2");
@@ -427,7 +518,7 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
 
         layeredPane.add(BranchPane, "card4");
@@ -512,7 +603,7 @@ public class MainPartnerForm extends javax.swing.JFrame {
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addComponent(UpdateOrderButton)
                 .addContainerGap())
         );
@@ -551,7 +642,7 @@ public class MainPartnerForm extends javax.swing.JFrame {
                             .addComponent(AccountButton, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
                             .addComponent(AccountButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(layeredPane, javax.swing.GroupLayout.PREFERRED_SIZE, 724, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(168, Short.MAX_VALUE))
+                .addContainerGap(112, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -573,8 +664,8 @@ public class MainPartnerForm extends javax.swing.JFrame {
                                 .addComponent(AccountButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addGap(18, 18, 18)
-                .addComponent(layeredPane, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 188, Short.MAX_VALUE))
+                .addComponent(layeredPane, javax.swing.GroupLayout.PREFERRED_SIZE, 381, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 87, Short.MAX_VALUE))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -585,7 +676,8 @@ public class MainPartnerForm extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         getContentPane().add(jPanel1, gridBagConstraints);
 
-        pack();
+        setSize(new java.awt.Dimension(816, 508));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -596,7 +688,8 @@ public class MainPartnerForm extends javax.swing.JFrame {
         switchPanels(BranchPane);
         tableBranch = (DefaultTableModel)jTableBranch.getModel();
         tableBranch.setRowCount(0);
-        String queryOrder = "SELECT * FROM CHINHANH";
+        //String queryOrder = "SELECT * FROM CHINHANH";
+        String queryOrder = "SELECT * FROM DTV_DTCHINHANH";
         try{
             PreparedStatement ppState = _connection.prepareStatement(queryOrder);
             rs = ppState.executeQuery();
@@ -615,7 +708,9 @@ public class MainPartnerForm extends javax.swing.JFrame {
         switchPanels(ContractPane);
         tableContract = (DefaultTableModel)jTableContract.getModel();
         tableContract.setRowCount(0);
-        String queryOrder = "SELECT * FROM HOPDONG";
+        //String queryOrder = "SELECT * FROM HOPDONG";
+        String queryOrder = "SELECT * FROM DTV_DTHOPDONG";
+        
         try{
             PreparedStatement ppState = _connection.prepareStatement(queryOrder);
             rs = ppState.executeQuery();
@@ -634,10 +729,10 @@ public class MainPartnerForm extends javax.swing.JFrame {
         switchPanels(ProductPane);
         tableProduct = (DefaultTableModel)jTableProduct.getModel();
         tableProduct.setRowCount(0);
-        String queryProduct = "SELECT * FROM SANPHAM";
+        String queryProduct = "SELECT * FROM DTV_DTSANPHAM";
         try{
             PreparedStatement ppState = _connection.prepareStatement(queryProduct);
-            rs = ppState.executeQuery();
+            rs = ppState.executeQuery();            
             while(rs.next()){
                 tableProduct.addRow(new Object[]{rs.getString("MASP"),
                 rs.getString("TENSP"),rs.getInt("DONGIA")});
@@ -653,7 +748,7 @@ public class MainPartnerForm extends javax.swing.JFrame {
         switchPanels(OrderPane);
         tableOrder = (DefaultTableModel)jTableOrder.getModel();
         tableOrder.setRowCount(0);
-        String queryOrder = "SELECT * FROM DONHANG";
+        String queryOrder = "SELECT * FROM DTV_DTDONHANG";
         try{
             PreparedStatement ppState = _connection.prepareStatement(queryOrder);
             rs = ppState.executeQuery();
@@ -734,34 +829,45 @@ public class MainPartnerForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_DeleteProductButtonActionPerformed
 
-    private void EditProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditProductButtonActionPerformed
+    private void inPriceFixButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inPriceFixButtonActionPerformed
         try{            
             if(jTableProduct.getSelectedRow()<0){
                 JOptionPane.showMessageDialog(rootPane, "No product is selected to update");
             }
             else{
                 int row = jTableProduct.getSelectedRow();
-                int price = Integer.parseInt(tableProduct.getValueAt(row,2).toString());
+                int amount = Integer.parseInt(AmountTextField.getText());
+                if(!AmountTextField.getText().matches("[0-9]+")){
+                    return;
+                }
                 String name = tableProduct.getValueAt(row,1).toString();
                 String ID = tableProduct.getValueAt(row,0).toString();
-                String updProductQRY = "UPDATE SANPHAM SET TENSP = ?, DONGIA = ?"
-                        + " WHERE MASP = ?";               
-                PreparedStatement ppState = _connection.prepareStatement(updProductQRY);
-                ppState.setString(1,name);
-                ppState.setInt(2,price);
-                ppState.setString(3,ID);
-                if(!ppState.execute()){
-                    JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+
+                CallableStatement cstmt = _connection.prepareCall("{? = call TANG_GIA_SP_DOITAC_FIX(?, ? ,?)}");
+                cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+                cstmt.setString(2,partnerID);
+                cstmt.setString(3,ID);
+                cstmt.setInt(4,amount);
+                if(cstmt.execute()){
+                    int rs = cstmt.getInt(1);
+                    if(rs ==1){
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                    }
+                    else{
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                    }
                 }
                 else{
-                    JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                    //JOptionPane.showMessageDialog(rootPane,"SYS ERROR");
                 }
+                cstmt.close();
+                ReFresh();
             }
         }
         catch(Exception e){
             e.printStackTrace();
         }
-    }//GEN-LAST:event_EditProductButtonActionPerformed
+    }//GEN-LAST:event_inPriceFixButtonActionPerformed
 
     private void BranchSupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BranchSupButtonActionPerformed
         int index = jTableProduct.getSelectedRow();
@@ -774,6 +880,170 @@ public class MainPartnerForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(rootPane,"No product is selected");
         }
     }//GEN-LAST:event_BranchSupButtonActionPerformed
+
+    private void AccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AccountButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_AccountButtonActionPerformed
+
+    private void CutPriceDLProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CutPriceDLProductButtonActionPerformed
+        try{            
+            if(jTableProduct.getSelectedRow()<0){
+                JOptionPane.showMessageDialog(rootPane, "No product is selected to update");
+            }
+            else{
+                int row = jTableProduct.getSelectedRow();
+                int amount = Integer.parseInt(AmountTextField.getText());
+                if(!AmountTextField.getText().matches("[0-9]+")){
+                    return;
+                }
+                String name = tableProduct.getValueAt(row,1).toString();
+                String ID = tableProduct.getValueAt(row,0).toString();
+                //String updProductQRY = "UPDATE SANPHAM SET TENSP = ?, DONGIA = ?"
+                //        + " WHERE MASP = ?";      
+                String updProductQRY = "GIAM_GIA_SP_DOITAC_DL ?,?,?";
+                
+                CallableStatement cstmt = _connection.prepareCall("{? = call GIAM_GIA_SP_DOITAC_DL(?, ? ,?)}");
+                cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+                cstmt.setString(2,partnerID);
+                cstmt.setString(3,ID);
+                cstmt.setInt(4,amount);
+                if(!cstmt.execute()){
+                    int rs = cstmt.getInt(1);
+                    if(rs ==1){
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                    }
+                    else{
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                    }
+                }
+                else{
+                    //JOptionPane.showMessageDialog(rootPane,"SYS ERROR");
+                }
+                cstmt.close();
+                ReFresh();
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_CutPriceDLProductButtonActionPerformed
+
+    private void inPriceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inPriceButtonActionPerformed
+        try{            
+            if(jTableProduct.getSelectedRow()<0){
+                JOptionPane.showMessageDialog(rootPane, "No product is selected to update");
+            }
+            else{
+                int row = jTableProduct.getSelectedRow();
+                int amount = Integer.parseInt(AmountTextField.getText());
+                if(!AmountTextField.getText().matches("[0-9]+")){
+                    return;
+                }
+                String name = tableProduct.getValueAt(row,1).toString();
+                String ID = tableProduct.getValueAt(row,0).toString();    
+                     
+                CallableStatement cstmt = _connection.prepareCall("{? = call TANG_GIA_SP_DOITAC(?, ? ,?)}");
+                cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+                cstmt.setString(2,partnerID);
+                cstmt.setString(3,ID);
+                cstmt.setInt(4,amount);
+                if(!cstmt.execute()){
+                    int rs = cstmt.getInt(1);
+                    if(rs ==1){
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                    }
+                    else{
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                    }
+                }
+                else{
+                    //JOptionPane.showMessageDialog(rootPane,"SYS ERROR");
+                }
+                cstmt.close();
+                ReFresh();
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_inPriceButtonActionPerformed
+
+    private void CutPriceProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CutPriceProductButtonActionPerformed
+        try{            
+            if(jTableProduct.getSelectedRow()<0){
+                JOptionPane.showMessageDialog(rootPane, "No product is selected to update");
+            }
+            else{
+                int row = jTableProduct.getSelectedRow();
+                int amount = Integer.parseInt(AmountTextField.getText());
+                if(!AmountTextField.getText().matches("[0-9]+")){
+                    return;
+                }
+                String name = tableProduct.getValueAt(row,1).toString();
+                String ID = tableProduct.getValueAt(row,0).toString();
+                
+                CallableStatement cstmt = _connection.prepareCall("{? = call GIAM_GIA_SP_DOITAC(?, ? ,?)}");
+                cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+                cstmt.setString(2,partnerID);
+                cstmt.setString(3,ID);
+                cstmt.setInt(4,amount);
+                if(!cstmt.execute()){
+                    int rs = cstmt.getInt(1);
+                    if(rs ==1){
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                    }
+                    else{
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                    }
+                }
+                else{
+                   // JOptionPane.showMessageDialog(rootPane,"SYS ERROR");
+                }
+                cstmt.close();
+                ReFresh();
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_CutPriceProductButtonActionPerformed
+
+    private void inPriceDLButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inPriceDLButtonActionPerformed
+        try{            
+            if(jTableProduct.getSelectedRow()<0){
+                JOptionPane.showMessageDialog(rootPane, "No product is selected to update");
+            }
+            else{
+                int row = jTableProduct.getSelectedRow();
+                int amount = Integer.parseInt(AmountTextField.getText());
+                if(!AmountTextField.getText().matches("[0-9]+")){
+                    return;
+                }
+                String name = tableProduct.getValueAt(row,1).toString();
+                String ID = tableProduct.getValueAt(row,0).toString();
+
+                CallableStatement cstmt = _connection.prepareCall("{? = call TANG_GIA_SP_DOITAC_DL(?, ? ,?)}");
+                cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+                cstmt.setString(2,partnerID);
+                cstmt.setString(3,ID);
+                cstmt.setInt(4,amount);
+                if(!cstmt.execute()){
+                    int rs = cstmt.getInt(1);
+                    if(rs ==1){
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE SUCCESS");
+                    }
+                    else{
+                        //JOptionPane.showMessageDialog(rootPane,"UPDATE FAIL");
+                    }
+                }
+                cstmt.close();
+                ReFresh();
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_inPriceDLButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -817,19 +1087,24 @@ public class MainPartnerForm extends javax.swing.JFrame {
     private javax.swing.JButton AccountButton;
     private javax.swing.JButton AccountButton1;
     private javax.swing.JButton AddProductButton;
+    private javax.swing.JTextField AmountTextField;
     private javax.swing.JButton BranchNavButton;
     private javax.swing.JPanel BranchPane;
     private javax.swing.JButton BranchSupButton;
     private javax.swing.JButton ContractNavButton;
     private javax.swing.JPanel ContractPane;
+    private javax.swing.JButton CutPriceDLProductButton;
+    private javax.swing.JButton CutPriceProductButton;
     private javax.swing.JButton DeleteProductButton;
-    private javax.swing.JButton EditProductButton;
     private javax.swing.JButton OrderNavButton;
     private javax.swing.JPanel OrderPane;
     private javax.swing.JButton ProductNavButton;
     private javax.swing.JPanel ProductPane;
     private javax.swing.JButton UpdateOrderButton;
     private javax.swing.JButton WatchDetailContractButton;
+    private javax.swing.JButton inPriceButton;
+    private javax.swing.JButton inPriceDLButton;
+    private javax.swing.JButton inPriceFixButton;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;

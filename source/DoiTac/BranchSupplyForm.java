@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package UI;
-import static UI.MainPartnerForm.getConnection;
-import static UI.MainPartnerForm.getPartnerID;
+package DoiTac;
+import static DoiTac.MainPartnerForm.getConnection;
+import static DoiTac.MainPartnerForm.getPartnerID;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -79,7 +79,7 @@ public class BranchSupplyForm extends javax.swing.JFrame {
         Quantity = new javax.swing.JSpinner(spinnerModel);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(800, 550));
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
@@ -217,7 +217,8 @@ public class BranchSupplyForm extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(25, 0, 25, 0);
         getContentPane().add(jPanel1, gridBagConstraints);
 
-        pack();
+        setSize(new java.awt.Dimension(816, 593));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void AddBranchSupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddBranchSupButtonActionPerformed
