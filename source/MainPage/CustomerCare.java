@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hcmus.system;
+package MainPage;
 
 /**
  *
@@ -44,7 +44,7 @@ public class CustomerCare extends javax.swing.JFrame {
         loginPanel.setBackground(new java.awt.Color(255, 222, 105));
 
         logoBtn.setBackground(new java.awt.Color(255, 222, 105));
-        logoBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hcmus/system/images/logo.png"))); // NOI18N
+        logoBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MainPage/images/logo.png"))); // NOI18N
         logoBtn.setBorderPainted(false);
         logoBtn.setContentAreaFilled(false);
 

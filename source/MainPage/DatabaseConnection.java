@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package hcmus.system;
+package MainPage;
 
 import java.sql.*;
 
@@ -16,7 +16,7 @@ public class DatabaseConnection {
     private static String SQL_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static String DB_URL = "jdbc:sqlserver://localhost:1433;" + "databaseName=QLDonHang";
     private static String USERNAME = "sa";
-    private static String PASSWORD = "password";
+    private static String PASSWORD = "dong*0909768334";
 
     public DatabaseConnection() {
         //initializeConnection();

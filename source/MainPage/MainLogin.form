@@ -99,7 +99,7 @@
               <Color blue="69" green="de" red="ff" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/hcmus/system/images/faststore-removebg-preview.png"/>
+              <Image iconType="3" name="/MainPage/images/faststore-removebg-preview.png"/>
             </Property>
             <Property name="borderPainted" type="boolean" value="false"/>
             <Property name="contentAreaFilled" type="boolean" value="false"/>

@@ -1,12 +1,13 @@
 ﻿----------Phantom---------- 
 GO
-CREATE
+CREATE OR ALTER
 --đối tác thực hiện thay đổi mật khẩu tài khoản
 PROC USP_CAU13_DT  
 	@MaDT CHAR(10),
 	@MKHienTai VARCHAR(10),
 	@MKMoi VARCHAR(8)
 AS
+SET TRAN ISOLATION LEVEL REPEATABLE READ
 BEGIN TRAN
 	BEGIN TRY
 	
@@ -50,12 +51,11 @@ RETURN 1
 ---
 GO
 CREATE
-
+OR ALTER
 --quản trị viên thực hiện xóa tài khoản của đối tác
 PROC USP_CAU13_QTV
 	@MADT CHAR(10)
 AS
-SET TRAN ISOLATION LEVEL SERIALIZABLE
 BEGIN TRAN
 	BEGIN TRY
 	IF NOT EXISTS (SELECT* FROM TAIKHOAN WHERE MaTK = @MaDT)

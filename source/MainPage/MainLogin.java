@@ -2,9 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+<<<<<<< HEAD
 package hcmus.system.MainPage;
 
 import hcmus.system.TaiXe.DriverProfile;
+=======
+package MainPage;
+
+import DoiTac.MainPartnerForm;
+import TaiXe.DriverProfile;
+>>>>>>> 84c3a6efed804e9a7f97117fc05f2d3e2a51f8a8
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,10 +26,20 @@ public class MainLogin extends javax.swing.JFrame {
     /**
      * Creates new form MainLogin
      */
+    static String accountID;
+    static Connection conn;
     public MainLogin() {
         initComponents();
     }
-
+    
+    public static String getAccountID(){
+        return accountID;
+    }
+    
+    public static Connection getDBConnection(){
+        return conn;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,7 +74,7 @@ public class MainLogin extends javax.swing.JFrame {
         loginLabel.setOpaque(true);
 
         logoBtn.setBackground(new java.awt.Color(255, 222, 105));
-        logoBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hcmus/system/images/faststore-removebg-preview.png"))); // NOI18N
+        logoBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MainPage/images/faststore-removebg-preview.png"))); // NOI18N
         logoBtn.setBorderPainted(false);
         logoBtn.setContentAreaFilled(false);
 
@@ -177,11 +194,12 @@ public class MainLogin extends javax.swing.JFrame {
         // TODO add your handling code here:
         username = usernameField.getText();
         password = String.valueOf(passwordField.getPassword());
+        
+        System.out.println(username+" "+password);
         String selectAccount = "SELECT * FROM TAIKHOAN WHERE TENTK='" + username + "'";
         int accountType = 0;
-
+        boolean accountStatus=false;
         boolean error = false;
-
         if (username.length() == 0 || password.length() == 0) {
             error = true;
             JOptionPane.showMessageDialog(null, "Please enter all fields");
@@ -198,12 +216,17 @@ public class MainLogin extends javax.swing.JFrame {
                     ResultSet rs = stmt.executeQuery();
                     while (rs.next()) {
                         accountType = rs.getInt(5);
+                        accountStatus = rs.getBoolean(4);
+                        accountID = rs.getString(1);
                         System.out.println(accountType);
                     }
-
+                    if(accountStatus == false){
+                        JOptionPane.showMessageDialog(rootPane, "YOUR ACCOUNT IS NOT ACTIVATED!! CONTACT US FOR SUPPORT");
+                    }
+                    conn = userConn;
                     db.closeConnection(adminConn);
-                    db.closeConnection(userConn);
-
+                    //db.closeConnection(userConn);
+                    
                     switch (accountType) {
                         case 1: // Khách hàng
                             break;
@@ -212,6 +235,8 @@ public class MainLogin extends javax.swing.JFrame {
                             new DriverProfile().setVisible(true);
                             break;
                         case 3: // Đối tác
+                            setVisible(false);
+                            new MainPartnerForm().setVisible(true);
                             break;
                         case 4: // Nhân viên
                             break;
