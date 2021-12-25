@@ -4,26 +4,72 @@
  */
 package Khachhang;
 
+import MainPage.DatabaseConnection;
 import Nhanvien.*;
+import MainPage.*;
 import java.awt.Color;
-
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author Le Trung Hieu
  */
 public class Homepage extends javax.swing.JFrame {
-
+    static Connection conn;
+    static List<String> cart = new ArrayList<>();
+    String maKH = MainLogin.getUsername();
     /**
      * Creates new form NewJFrame
      */
     public Homepage() {
         initComponents();
-        
+        showInforTable();
+
         //set color
         Color col = new Color(255, 222, 105);
         getContentPane().setBackground(col);
     }
-
+    public static List<String> getCartList(){
+        return cart;
+    }
+    private void showInforTable(){
+        DatabaseConnection db = new DatabaseConnection();
+        conn = db.getDbConnection("sa", "123");
+        try {
+            
+            String SQL = "select tendt from Doitac";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            DefaultListModel model = new DefaultListModel();
+            while (rs.next()) {
+              
+               
+                //System.out.println(rs.getString(1));
+                model.add(0, rs.getString(1));
+            }
+            List.setModel(model);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            String selectDonHang = "SELECT * FROM SANPHAM";
+            PreparedStatement stmt = conn.prepareStatement(selectDonHang);
+            ResultSet rs = stmt.executeQuery();
+            DefaultTableModel tbModel = (DefaultTableModel) Table.getModel();
+            tbModel.setRowCount(0);
+            while (rs.next()) {
+                Object[] data = {rs.getString(2), rs.getString(3)};
+                System.out.println(rs.getString(2));
+                tbModel.addRow(data);
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -39,11 +85,12 @@ public class Homepage extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        Table = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        jTextField5 = new javax.swing.JTextField();
-        jButton8 = new javax.swing.JButton();
+        List = new javax.swing.JList<>();
+        TFSearch = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -99,34 +146,61 @@ public class Homepage extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        Table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Product", "Price"
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
-        jScrollPane2.setViewportView(jList1);
+        Table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TableMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(Table);
 
-        jButton8.setBackground(new java.awt.Color(190, 8, 8));
-        jButton8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton8.setForeground(new java.awt.Color(255, 255, 255));
-        jButton8.setText("Search");
-        jButton8.setBorder(null);
-        jButton8.addActionListener(new java.awt.event.ActionListener() {
+        List.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ListMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(List);
+
+        TFSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton8ActionPerformed(evt);
+                TFSearchActionPerformed(evt);
+            }
+        });
+
+        btnSearch.setBackground(new java.awt.Color(190, 8, 8));
+        btnSearch.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSearch.setForeground(new java.awt.Color(255, 255, 255));
+        btnSearch.setText("Search");
+        btnSearch.setBorder(null);
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+
+        jButton7.setBackground(new java.awt.Color(190, 8, 8));
+        jButton7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButton7.setForeground(new java.awt.Color(255, 255, 255));
+        jButton7.setText("Orders");
+        jButton7.setBorder(null);
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
             }
         });
 
@@ -137,7 +211,9 @@ public class Homepage extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(35, 35, 35)
                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 273, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(13, 13, 13)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -150,12 +226,12 @@ public class Homepage extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 472, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(TFSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 472, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(1, 1, 1))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 613, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -165,12 +241,13 @@ public class Homepage extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
-                    .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(TFSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                    .addComponent(btnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
@@ -188,20 +265,101 @@ public class Homepage extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
+        setVisible(false);
+        new AccountScreen().setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
+        setVisible(false);
+        new MainLogin().setVisible(true);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
+        setVisible(false);
+        new Cart().setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton8ActionPerformed
+        DatabaseConnection db = new DatabaseConnection();
+        Connection adminConn = db.getAdminConnection();
+        if(btnSearch.getText().equals("Search")){
+            try {
+                String nameProduct = TFSearch.getText();
+                String selectDonHang = "SELECT * FROM SANPHAM WHERE TENSP LIKE '" + nameProduct + "'";
+                PreparedStatement stmt = adminConn.prepareStatement(selectDonHang);
+                ResultSet rs = stmt.executeQuery();
+                DefaultTableModel tbModel = (DefaultTableModel) Table.getModel();
+                tbModel.setRowCount(0);
+                while (rs.next()) {
+                    Object[] data = {rs.getString(2), rs.getString(3)};
+                    tbModel.addRow(data);
+                }
 
+                db.closeConnection(adminConn);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+            btnSearch.setText("Back");
+        }
+        else {
+            showInforTable();
+            btnSearch.setText("Search");
+        }
+        
+        
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void ListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ListMouseClicked
+        // TODO add your handling code here:
+        String tenDT = List.getSelectedValue().toString();
+        System.out.println(tenDT);
+        try {
+                       
+            String SQL = "select Sanpham.* from SANPHAM, Doitac where SANPHAM.MADT = Doitac.MADT and Doitac.TENDT='"+tenDT+"'";
+            System.out.println(SQL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            DefaultTableModel tbModel = (DefaultTableModel)Table.getModel();
+            tbModel.setRowCount(0);
+            while (rs.next()) {
+              
+                Object[] data = {rs.getString(2), rs.getString(3)};
+                System.out.println(rs.getString(2));
+                tbModel.addRow(data);
+            }
+
+        } catch (SQLException ex) {
+
+        }
+    }//GEN-LAST:event_ListMouseClicked
+
+    private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
+        // TODO add your handling code here:
+        int option = JOptionPane.showConfirmDialog(null, "Add this product to the cart ???");
+        System.out.println(option);
+        
+        if (option == 0) {
+            DefaultTableModel model = (DefaultTableModel) Table.getModel();
+            int selectedRow = Table.getSelectedRow();
+
+            cart.add(model.getValueAt(selectedRow, 0).toString());
+            JOptionPane.showMessageDialog(null, "Add product to the cart successfully!!!");
+
+        }
+    }//GEN-LAST:event_TableMouseClicked
+
+    private void TFSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TFSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TFSearchActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        new OrderListScreen().setVisible(true);
+    }//GEN-LAST:event_jButton7ActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -253,16 +411,17 @@ public class Homepage extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JList<String> List;
+    private javax.swing.JTextField TFSearch;
+    private javax.swing.JTable Table;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JList<String> jList1;
+    private javax.swing.JButton jButton7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField5;
     // End of variables declaration//GEN-END:variables
 }
