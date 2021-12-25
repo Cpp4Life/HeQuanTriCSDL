@@ -227,7 +227,7 @@ public class OnGoingOrder extends javax.swing.JFrame {
 
     private void showOrders() {
         Connection adminConn = db.getAdminConnection();
-        String selectDonHang = "SELECT * FROM DONHANG WHERE TINHTRANG = 2";
+        String selectDonHang = "SELECT * FROM DONHANG";
 
         try {
             DefaultTableModel tableModel = (DefaultTableModel) orderTable.getModel();
@@ -237,9 +237,17 @@ public class OnGoingOrder extends javax.swing.JFrame {
                 String orderId = rs.getString("MADH");
                 String productId = rs.getString("MASP");
                 int deliveryStatus = rs.getInt("TINHTRANG");
-                String deliveryDescription = "ĐANG GIAO";
+                String deliveryDescription = "";
 
-                Object[] data = {orderId, productId, deliveryStatus, deliveryDescription,};
+                if (deliveryStatus == 1) {
+                    deliveryDescription = "ĐÃ NHẬN ĐƠN";
+                } else if (deliveryStatus == 2) {
+                    deliveryDescription = "ĐANG GIAO";
+                } else if (deliveryStatus == 3) {
+                    deliveryDescription = "ĐÃ GIAO TỚI";
+                }
+
+                Object[] data = {orderId, productId, deliveryStatus, deliveryDescription};
                 tableModel.addRow(data);
             }
 

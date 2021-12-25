@@ -50,6 +50,7 @@ public class Order extends javax.swing.JFrame {
         totalLabel = new javax.swing.JLabel();
         totalField = new javax.swing.JTextField();
         acceptBtn = new javax.swing.JButton();
+        checkOrderStatusBtn = new javax.swing.JButton();
         profileBtn = new javax.swing.JButton();
         helpBtn = new javax.swing.JButton();
 
@@ -146,17 +147,24 @@ public class Order extends javax.swing.JFrame {
         acceptBtn.setBackground(new java.awt.Color(190, 8, 8));
         acceptBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         acceptBtn.setForeground(new java.awt.Color(255, 255, 255));
-        acceptBtn.setText("ACCEPT");
+        acceptBtn.setText("Accept");
         acceptBtn.setBorderPainted(false);
+
+        checkOrderStatusBtn.setBackground(new java.awt.Color(190, 8, 8));
+        checkOrderStatusBtn.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        checkOrderStatusBtn.setForeground(new java.awt.Color(255, 255, 255));
+        checkOrderStatusBtn.setText("Check Order Status");
+        checkOrderStatusBtn.setBorderPainted(false);
+        checkOrderStatusBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkOrderStatusBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout detailPanelLayout = new javax.swing.GroupLayout(detailPanel);
         detailPanel.setLayout(detailPanelLayout);
         detailPanelLayout.setHorizontalGroup(
             detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, detailPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(acceptBtn)
-                .addGap(60, 60, 60))
             .addGroup(detailPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -173,6 +181,14 @@ public class Order extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(totalField, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, detailPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(checkOrderStatusBtn)
+                .addGap(23, 23, 23))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, detailPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(acceptBtn)
+                .addGap(72, 72, 72))
         );
         detailPanelLayout.setVerticalGroup(
             detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,8 +205,10 @@ public class Order extends javax.swing.JFrame {
                 .addGroup(detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(totalLabel)
                     .addComponent(totalField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(29, 29, 29)
+                .addGap(26, 26, 26)
                 .addComponent(acceptBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(checkOrderStatusBtn)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -319,6 +337,60 @@ public class Order extends javax.swing.JFrame {
         new OnGoingOrder().setVisible(true);
     }//GEN-LAST:event_onGoingBtnActionPerformed
 
+    private void checkOrderStatusBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkOrderStatusBtnActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel tableModel = (DefaultTableModel) orderTable.getModel();
+        int selectedIndexRow = orderTable.getSelectedRow();
+        if (selectedIndexRow != -1) {
+            try {
+                String orderId = tableModel.getValueAt(selectedIndexRow, 0).toString();
+                String driverId = "";
+
+                username = MainRegister.getUsername() == null ? MainLogin.getUsername() : MainRegister.getUsername();
+
+                Connection adminConn = db.getAdminConnection();
+                String selectDriver = "SELECT * FROM TAIKHOAN WHERE TENTK='" + username + "'";
+                PreparedStatement stmt = adminConn.prepareStatement(selectDriver);
+                ResultSet rs = stmt.executeQuery();
+
+                int executeStatus;
+                int deliveryStatus;
+
+                while (rs.next()) {
+                    driverId = rs.getString("MATK");
+                }
+
+                System.out.println(orderId + " " + driverId);
+                String tran_1_driver = "{? = call USP_CAU11_TX(?, ?, ?)}";
+                CallableStatement st = adminConn.prepareCall(tran_1_driver);
+                st.registerOutParameter(1, Types.INTEGER);
+                st.setString(2, orderId);
+                st.setString(3, driverId);
+                st.registerOutParameter(4, Types.INTEGER);
+                st.execute();
+
+                executeStatus = st.getInt(1);
+                deliveryStatus = st.getInt(4);
+
+                db.closeConnection(adminConn);
+
+                if (executeStatus == 1) {
+                    if (deliveryStatus == 1) {
+                        JOptionPane.showMessageDialog(null, "ĐÃ NHẬN");
+                    } else if (deliveryStatus == 2) {
+                        JOptionPane.showMessageDialog(null, "ĐANG GIAO HÀNG");
+                    } else if (deliveryStatus == 3) {
+                        JOptionPane.showMessageDialog(null, "ĐÃ GIAO TỚI");
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(Order.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Please select a row");
+        }
+    }//GEN-LAST:event_checkOrderStatusBtnActionPerformed
+
     private void showOrders() {
         Connection adminConn = db.getAdminConnection();
         String selectDonHang = "SELECT * FROM DONHANG";
@@ -331,9 +403,9 @@ public class Order extends javax.swing.JFrame {
             while (rs.next()) {
                 String orderId = rs.getString("MADH");
                 String productId = rs.getString("MASP");
+                int deliveryStatus = rs.getInt("TINHTRANG");
                 String deliveryAddr = rs.getString("DIACHIGIAOHANG");
                 double price = rs.getDouble("DONGIA");
-                int deliveryStatus = rs.getInt("TINHTRANG");
 
                 Object[] data = {orderId, productId, deliveryStatus, deliveryAddr, price};
                 tableModel.addRow(data);
@@ -384,9 +456,11 @@ public class Order extends javax.swing.JFrame {
     }
 
     private DatabaseConnection db = new DatabaseConnection();
+    String username;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton acceptBtn;
+    private javax.swing.JButton checkOrderStatusBtn;
     private javax.swing.JTextField dateField;
     private javax.swing.JPanel detailPanel;
     private javax.swing.JButton helpBtn;

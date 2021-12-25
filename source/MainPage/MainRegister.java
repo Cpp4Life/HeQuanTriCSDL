@@ -2,7 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hcmus.system;
+package hcmus.system.MainPage;
+
+import hcmus.system.KhachHang.RegisterScreen;
+import hcmus.system.NhanVien.StaffRegister;
+import hcmus.system.TaiXe.DriverRegister;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -246,11 +250,11 @@ public class MainRegister extends javax.swing.JFrame {
                 if (type.equals("Đối tác")) {
 
                 } else if (type.equals("Khách hàng")) {
-
+                    new RegisterScreen().setVisible(true);
                 } else if (type.equals("Tài xế")) {
                     new DriverRegister().setVisible(true);
                 } else if (type.equals("Nhân viên")) {
-
+                    new StaffRegister().setVisible(true);
                 }
 
             } catch (SQLException ex) {
